@@ -1,6 +1,9 @@
 'use strict';
 
-function stableStringifyImpl(value, cycles, keyOrIndex) {
+function stableStringifyImpl(value, replacer, cycles, keyOrIndex) {
+  if (replacer) {
+    value = replacer('', value);
+  }
   if (value != null) {
     var toJSON = value.toJSON;
     if (typeof toJSON === 'function') {
@@ -51,7 +54,7 @@ function stableStringifyImpl(value, cycles, keyOrIndex) {
       str = '[';
       comma = false;
       for (i = 0; i < value.length; ++i) {
-        var item = stableStringifyImpl(value[i], cycles, i);
+        var item = stableStringifyImpl(value[i], replacer, cycles, i);
         if (comma) {
           str += ',';
         } else {
@@ -77,7 +80,7 @@ function stableStringifyImpl(value, cycles, keyOrIndex) {
       var keys = Object.keys(value).sort();
       for (i = 0; i < keys.length; ++i) {
         var key = keys[i];
-        var val = stableStringifyImpl(value[key], cycles, key);
+        var val = stableStringifyImpl(value[key], replacer, cycles, key);
         if (val === undefined) {
           continue;
         }
@@ -97,6 +100,9 @@ function stableStringifyImpl(value, cycles, keyOrIndex) {
   }
 }
 
-module.exports = function stableStringify(value) {
-  return stableStringifyImpl(value, new WeakSet(), '');
+module.exports = function stableStringify(value, replacer) {
+  if (typeof replacer !== 'function') {
+    replacer = null;
+  }
+  return stableStringifyImpl(value, replacer, new WeakSet(), '');
 };

@@ -4,8 +4,9 @@
 const Assert = require('chai').assert;
 const stableStringify = require('./index');
 
-function assertEqualsNative(value) {
-  Assert.equal(stableStringify(value), JSON.stringify(value));
+function assertEqualsNative(value, replacer) {
+  Assert.equal(stableStringify(value, replacer),
+               JSON.stringify(value, replacer));
 }
 
 describe('native parity', () => {
@@ -129,6 +130,24 @@ describe('native parity', () => {
 
   it('"handles" functions', () => {
     assertEqualsNative(function ಠ_ಠ() {});
+  });
+
+  const funcReplacer = function (key, value) {
+    if (typeof value === 'function') {
+      return value.toString();
+    }
+    return value;
+  };
+
+  const testFunction = function () {
+    return 'Hello World';
+  };
+
+  it('supports replacer function', () => {
+    assertEqualsNative([testFunction], funcReplacer);
+    assertEqualsNative({func: testFunction}, funcReplacer);
+    assertEqualsNative([testFunction]);
+    assertEqualsNative({func: testFunction});
   });
 
 });
