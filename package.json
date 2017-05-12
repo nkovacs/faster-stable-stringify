@@ -1,5 +1,5 @@
 {
-  "name": "faster-stable-stringify",
+  "name": "faster-stable-stringify-2",
   "version": "1.0.0",
   "description": "Faster deterministic JSON.stringify() without bells and whistles.",
   "main": "index.js",
